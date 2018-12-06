@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Prototype/Scenes/SampleScene.unity
+- path: Assets/MindMap/Scenes/HierarchyTestScene.unity
   isLoaded: 1
   isActive: 1

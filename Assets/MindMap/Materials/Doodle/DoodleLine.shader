@@ -43,6 +43,7 @@
 			fixed4 _LineColor;
 			float _Thickness;
 
+#define OVERRIDE_TRANSFORM
 // If OVERRIDE_TRANSFORM keyword is enabled, use a custom model matrix
 #ifdef OVERRIDE_TRANSFORM
 			float4x4 _ModelMatrix;
