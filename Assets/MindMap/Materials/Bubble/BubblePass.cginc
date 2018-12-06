@@ -23,17 +23,18 @@ struct v2f
 
 sampler2D _MainTex;
 float4 _MainTex_ST;
+// float4x4 _ModelMatrix_IT; // Not actually useful for anything - just declared here so there aren't any errors at runtime
 
 fixed4 _Color;
 fixed _EdgeColor;
 fixed _TextureOpacity;
 fixed _LightAlphaWeight;
 
-float4x4 _WorldMatrix;
+float4x4 _ModelMatrix;
 // override _WorldMatrix with the default transform, to disable it
-#define _WorldMatrix UNITY_MATRIX_M
+// #define _WorldMatrix UNITY_MATRIX_M
 // use a macro to reference the custom world transform, to make it easier to change
-#define WORLDMATRIX _WorldMatrix
+#define WORLDMATRIX _ModelMatrix
 
 #ifndef FINAL_ALPHA_MULTIPLIER
 #define FINAL_ALPHA_MULTIPLIER 1.0
