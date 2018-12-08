@@ -2,6 +2,7 @@
 #pragma fragment frag
 // make fog work
 #pragma multi_compile_fog
+#pragma multi_compile OVERRIDE_TRANSFORM DEFAULT_TRANSFORM
 
 #include "UnityCG.cginc"
 #include "Lighting.cginc"
@@ -30,10 +31,14 @@ fixed _EdgeColor;
 fixed _TextureOpacity;
 fixed _LightAlphaWeight;
 
-float4x4 _ModelMatrix;
+
+// call material.EnableKeyword("OVERRIDE_TRANSFORM") to enable the custom localToWorld matrix
+#if defined(OVERRIDE_TRANSFORM)
 // override _WorldMatrix with the default transform, to disable it
-// #define _WorldMatrix UNITY_MATRIX_M
-// use a macro to reference the custom world transform, to make it easier to change
+float4x4 _ModelMatrix;
+#else
+#define _ModelMatrix UNITY_MATRIX_M
+#endif
 #define WORLDMATRIX _ModelMatrix
 
 #ifndef FINAL_ALPHA_MULTIPLIER

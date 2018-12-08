@@ -1,4 +1,4 @@
-﻿Shader "Geometry/DoodleLine"
+﻿Shader "Geometry/UnityDoodleLine"
 {
 	Properties
 	{
@@ -17,7 +17,6 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma geometry geom
-#define OVERRIDE_TRANSFORM
 #include "DoodleLine.cginc"
 			ENDCG
 		}

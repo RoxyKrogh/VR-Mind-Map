@@ -1,4 +1,4 @@
-﻿Shader "MindMap/Bubble"
+﻿Shader "MindMap/UnityBubble"
 {
 	Properties
 	{
@@ -22,7 +22,6 @@
 			CULL FRONT
 
 			CGPROGRAM
-#define OVERRIDE_TRANSFORM
 			#pragma vertex vert
 			#pragma fragment frag
 			//#define FORWARD_ALPHA_DISABLED
@@ -38,7 +37,6 @@
 			CULL BACK
 
 			CGPROGRAM
-#define OVERRIDE_TRANSFORM
 			#pragma vertex vert
 			#pragma fragment frag
 			#define FINAL_ALPHA_MULTIPLIER 1.0
