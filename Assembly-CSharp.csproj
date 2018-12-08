@@ -55,8 +55,10 @@
   <ItemGroup>
      <Compile Include="Assets\MindMap\Controller\InputController.cs" />
      <Compile Include="Assets\MindMap\Controller\MainController.cs" />
+     <Compile Include="Assets\MindMap\Controller\TestControllerDontUpvote.cs" />
      <Compile Include="Assets\MindMap\Model\NodePrimitive.cs" />
      <Compile Include="Assets\MindMap\Model\SceneNode.cs" />
+     <Compile Include="Assets\MindMap\Model\SceneNodeCollider.cs" />
      <Compile Include="Assets\MindMap\Model\TheWorld.cs" />
      <Compile Include="Assets\MindMap\Other\DisableFrustumCuling.cs" />
      <Compile Include="Assets\Prototype\Doodle\CrossTest.cs" />
