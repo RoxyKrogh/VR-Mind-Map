@@ -9,6 +9,8 @@ public interface InputControlState
     bool IsGrabbing { get; }
     bool IsActivating { get; }
     bool IsSelecting { get; }
+    Vector2 AxisPosition { get; }
+    Vector2 AxisDelta { get; }
     Transform HandObject { get; }
     T GetComponent<T>();
 }
@@ -105,6 +107,22 @@ public class InputController : MonoBehaviour, InputControlState
         get
         {
             return handObject == null ? transform : handObject;
+        }
+    }
+
+    public Vector2 AxisPosition
+    {
+        get
+        {
+            return swipeAction.GetAxis(inputSource);
+        }
+    }
+
+    public Vector2 AxisDelta
+    {
+        get
+        {
+            return swipeAction.GetAxisDelta(inputSource);
         }
     }
 
