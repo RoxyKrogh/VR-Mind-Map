@@ -23,7 +23,7 @@ public class EquipmentSlot : MonoBehaviour {
         {
             if (inventory.Length == 0)
                 return null;
-            return inventory[Mathf.Abs(index % inventory.Length)];
+            return inventory[WrappedIndex(index, inventory.Length)];
         }
     }
 
@@ -42,6 +42,13 @@ public class EquipmentSlot : MonoBehaviour {
 		
 	}
 
+    private void OnEnable()
+    {
+        Tool active = ActiveTool;
+        foreach (Tool t in inventory)
+            t.gameObject.SetActive(t == active);
+    }
+
     private void EquipTool(int slot)
     {
         if (inventory.Length == 0 || slot == _activeSlot)
@@ -52,7 +59,7 @@ public class EquipmentSlot : MonoBehaviour {
         {
             this[_activeSlot].gameObject.SetActive(false);
         }
-        _activeSlot = Mathf.Abs(slot % inventory.Length);
+        _activeSlot = WrappedIndex(slot, inventory.Length);
         if (next != null)
             this[_activeSlot].gameObject.SetActive(true);
     }
@@ -70,5 +77,10 @@ public class EquipmentSlot : MonoBehaviour {
                 toolName = myTarget.ActiveTool.name;
             EditorGUILayout.LabelField("Active Tool", toolName);
         }
+    }
+
+    public static int WrappedIndex(int index, int length)
+    {
+        return ((index % length) + length) % length;
     }
 }
