@@ -23,25 +23,25 @@ public class TheWorld : MonoBehaviour
     }
 
     // List of all root scenenodes that are children of the world
-    public List<SceneNode> _roots;
+    public List<SceneNode> _roots = new List<SceneNode>();
 
     private delegate void TransformationMethod(Transform trs1, Transform trs2);
 
-    private Dictionary<Transform, GrabberInfo> _movementPairs;
+    private Dictionary<Transform, GrabberInfo> _movementPairs = new Dictionary<Transform, GrabberInfo>();
 
-    private Dictionary<Transform, DoodlePenInfo> _pens;
+    private Dictionary<Transform, DoodlePenInfo> _pens = new Dictionary<Transform, DoodlePenInfo>();
 
-    private Dictionary<Transform, Transform> _reparentPairs;
+    private Dictionary<Transform, Transform> _reparentPairs = new Dictionary<Transform, Transform>();
 
     // Use this for initialization
     void Start()
     {
-        foreach (SceneNode child in transform)
-            _roots.Add(child);
-
-        _movementPairs = new Dictionary<Transform, GrabberInfo>();
-        _pens = new Dictionary<Transform, DoodlePenInfo>();
-        _reparentPairs = new Dictionary<Transform, Transform>();
+        foreach (Transform child in transform)
+        {
+            SceneNode node = child.GetComponent<SceneNode>();
+            if (node != null)
+                _roots.Add(node);
+        }
     }
 
     // Update is called once per frame
