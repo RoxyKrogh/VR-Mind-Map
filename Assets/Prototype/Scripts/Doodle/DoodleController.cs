@@ -16,6 +16,7 @@ public class DoodleController : MonoBehaviour {
         Bubble[] bubbles = _world.GetComponentsInChildren<Bubble>();
         foreach (DoodlePen pen in pens)
         {
+            
             Vector3 worldPen = pen.transform.position;
             Bubble target = null;
             float closest = float.PositiveInfinity;

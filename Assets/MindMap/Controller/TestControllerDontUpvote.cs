@@ -12,6 +12,7 @@ public class TestControllerDontUpvote : MonoBehaviour {
         foreach (InputController ic in _controllers)
         {
             ic.onGrab.AddListener(onGrab);
+            ic.onSelect.AddListener(onTriggerPull);
         }
 
     }
@@ -23,9 +24,19 @@ public class TestControllerDontUpvote : MonoBehaviour {
 
     private void onGrab(InputControlState ics, bool grabbed)
     {
+        Debug.Log("Grab action! " + grabbed);
         if (grabbed)
             _theWorld.GrabObject(ics.HandObject.transform);
         else
             _theWorld.ReleaseObject(ics.HandObject.transform);
+    }
+
+    private void onTriggerPull(InputControlState ics, bool pulled)
+    {
+        Debug.Log("Trigger action!");
+        if (pulled)
+            _theWorld.StartDrawing(ics.HandObject.transform);
+        else
+            _theWorld.StopDrawing(ics.HandObject.transform);
     }
 }

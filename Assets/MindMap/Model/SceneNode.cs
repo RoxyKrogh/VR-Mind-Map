@@ -10,6 +10,7 @@ public class SceneNode : MonoBehaviour {
     
     public Vector3 NodeOrigin = Vector3.zero;
     public List<NodePrimitive> PrimitiveList;
+    public Transform GeometryList;
 
     public Transform AxisFrame = null;
     private Vector3 kDefaultTreeTip = new Vector3(0, 0, 0);
@@ -17,7 +18,9 @@ public class SceneNode : MonoBehaviour {
 	// Use this for initialization
 	protected void Start () {
         InitializeSceneNode();
-        // Debug.Log("PrimitiveList:" + PrimitiveList.Count);
+
+        if (GeometryList == null)
+            GeometryList = transform.Find("Geom");
 	}
 	
 	// Update is called once per frame
@@ -46,9 +49,12 @@ public class SceneNode : MonoBehaviour {
                 cn.CompositeXform(ref mCombinedParentXform);
             }
         }
-        
+
+        // If we have a Geometry list attached to this, we can just use that
+        NodePrimitive[] geomList = GeometryList == null ? PrimitiveList.ToArray() : GeometryList.GetComponentsInChildren<NodePrimitive>();
+
         // disenminate to primitives
-        foreach (NodePrimitive p in PrimitiveList)
+        foreach (NodePrimitive p in geomList)
         {
             p.LoadShaderMatrix(ref mCombinedParentXform);
         }
