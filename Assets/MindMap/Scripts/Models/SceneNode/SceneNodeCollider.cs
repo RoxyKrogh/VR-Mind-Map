@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Basic sphere collision tag for geometries within a scenenode
+[RequireComponent(typeof(SceneNode))]
 public class SceneNodeCollider : MonoBehaviour {
 
-    private const float DEFAULT_RADIUS = 0.5f;
+    public float mRadius = 0.5f;
 
-    private Vector3 actualPos
-    {
-        get
-        {
-            return GetComponent<Renderer>().material.GetMatrix("_ModelMatrix").MultiplyPoint(new Vector3(0, 0, 0));
-        }
-    }
+    public SceneNode sceneNode { get { return GetComponent<SceneNode>(); } }
+
+    private Vector3 actualPos { get { return sceneNode.WorldPosition; } }
 
     void OnDrawGizmos()
     {
-
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(actualPos, DEFAULT_RADIUS);
+        Gizmos.DrawWireSphere(actualPos, mRadius);
     }
 
     // Whether the given transform falls within the spherical boundaries of this object
     public bool Collides(Transform pos)
     {
-        return SqrDistFrom(pos) <= DEFAULT_RADIUS * DEFAULT_RADIUS;
+        return SqrDistFrom(pos) <= mRadius * mRadius;
     }
 
     public float SqrDistFrom(Transform pos)

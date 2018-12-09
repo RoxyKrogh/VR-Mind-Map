@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class SceneNode : MonoBehaviour {
 
-    protected Matrix4x4 mCombinedParentXform;
-    
+    private Matrix4x4 mCombinedParentXform;
+    public Matrix4x4 CombinedParentXform { get { return mCombinedParentXform; } private set { mCombinedParentXform = value; } }
+    public Vector3 WorldPosition { get { return mCombinedParentXform.GetColumn(3); } }
+
     public Vector3 NodeOrigin = Vector3.zero;
     public List<NodePrimitive> PrimitiveList;
     public Transform GeometryList;
