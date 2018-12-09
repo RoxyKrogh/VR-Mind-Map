@@ -64,6 +64,7 @@
     <Compile Include="Assets\MindMap\Controller\InputController.cs" />
     <Compile Include="Assets\MindMap\Controller\MainController.cs" />
     <Compile Include="Assets\MindMap\Controller\TestControllerDontUpvote.cs" />
+    <Compile Include="Assets\MindMap\Controller\ThumbnailController.cs" />
     <Compile Include="Assets\MindMap\Controller\ToolSelectController.cs" />
     <Compile Include="Assets\MindMap\Model\EquipmentSlot.cs" />
     <Compile Include="Assets\MindMap\Model\NodePrimitive.cs" />

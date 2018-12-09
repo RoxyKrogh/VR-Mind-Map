@@ -68,7 +68,6 @@ public interface XformProvider
     }
 }
 
-[RequireComponent(typeof(XformProvider))]
 public class XformMonoBehaviour : MonoBehaviour
 {
     private XformProvider xformProvider = null;

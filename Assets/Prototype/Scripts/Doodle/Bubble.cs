@@ -7,6 +7,8 @@ public class Bubble : MonoBehaviour {
 
     public float radiusScale = 1.0f;
 
+    public Quaternion thumbnailAngle = Quaternion.identity;
+
     public void AddDoodle(MeshFilter doodle)
     {
         doodle.transform.SetParent(transform);

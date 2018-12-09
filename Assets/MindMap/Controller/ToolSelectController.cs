@@ -42,5 +42,6 @@ public class ToolSelectController : MonoBehaviour {
     {
         previousView.targetTool = model[model.ActiveSlot - 1];
         nextView.targetTool = model[model.ActiveSlot + 1];
+        inputController.handObject = model.ActiveTool.Tip;
     }
 }

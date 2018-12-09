@@ -56,6 +56,11 @@ public class Tool : MonoBehaviour {
         }
     }
 
+    public Transform Tip
+    {
+        get { return transform.Find("Tip"); }
+    }
+
     [CustomEditor(typeof(Tool))]
     public class ToolEditor : Editor
     {
