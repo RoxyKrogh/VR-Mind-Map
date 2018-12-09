@@ -39,4 +39,12 @@ public class TestControllerDontUpvote : MonoBehaviour {
         else
             _theWorld.StopDrawing(ics.HandObject.transform);
     }
+
+    private void onTrackpadClick(InputControlState ics, bool clicked)
+    {
+        if (clicked)
+            _theWorld.CreateBubble(ics.HandObject.transform, true);
+        else
+            _theWorld.ReleaseObject(ics.HandObject.transform);
+    }
 }

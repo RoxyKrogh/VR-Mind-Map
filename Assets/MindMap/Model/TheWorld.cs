@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TheWorld : MonoBehaviour
 {
-    public MeshFilter doodleTarget;
+    public MeshFilter _doodleTarget;
 
     // Contains all information necessary to grab an object from any point an move it relative to its starting position,
     // without just snapping it
@@ -22,42 +22,46 @@ public class TheWorld : MonoBehaviour
         public DoodlePen pen;
     }
 
-    public SceneNode _root;
+    // List of all root scenenodes that are children of the world
+    public List<SceneNode> _roots;
 
     private delegate void TransformationMethod(Transform trs1, Transform trs2);
 
-    private Dictionary<Transform, GrabberInfo> movementPairs;
+    private Dictionary<Transform, GrabberInfo> _movementPairs;
 
-    private Dictionary<Transform, DoodlePenInfo> pens;
+    private Dictionary<Transform, DoodlePenInfo> _pens;
+
+    private Dictionary<Transform, Transform> _reparentPairs;
 
     // Use this for initialization
     void Start()
     {
-        movementPairs = new Dictionary<Transform, GrabberInfo>();
-        pens = new Dictionary<Transform, DoodlePenInfo>();
+        foreach (SceneNode child in transform)
+            _roots.Add(child);
+
+        _movementPairs = new Dictionary<Transform, GrabberInfo>();
+        _pens = new Dictionary<Transform, DoodlePenInfo>();
+        _reparentPairs = new Dictionary<Transform, Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (_root != null)
+        foreach(SceneNode root in _roots)
         {
             Matrix4x4 i = transform.localToWorldMatrix;
-            _root.CompositeXform(ref i);
+            root.CompositeXform(ref i);
         }
 
-        foreach (KeyValuePair<Transform, GrabberInfo> kvp in movementPairs)
+        foreach (KeyValuePair<Transform, GrabberInfo> kvp in _movementPairs)
             MoveObject(kvp.Key, kvp.Value);
 
-        foreach (KeyValuePair<Transform, DoodlePenInfo> kvp in pens)
-        {
+        foreach (KeyValuePair<Transform, DoodlePenInfo> kvp in _pens)
             UpdatePenTarget(kvp.Key, kvp.Value.pen);
-        }
     }
 
     public void GrabObject(Transform parentTransform)
     {
-        // SceneNodeCollider target = null;
         GrabberInfo grabberInfo = new GrabberInfo();
 
         Transform target = GetObjectNearestTransform(parentTransform);
@@ -69,13 +73,13 @@ public class TheWorld : MonoBehaviour
             grabberInfo.startRotForward = parentTransform.worldToLocalMatrix.MultiplyVector(target.forward);
             grabberInfo.startRotUp = parentTransform.worldToLocalMatrix.MultiplyVector(target.up);
 
-            movementPairs.Add(parentTransform, grabberInfo);
+            _movementPairs.Add(parentTransform, grabberInfo);
         }
     }
 
     public void ReleaseObject(Transform parentTransform)
     {
-        movementPairs.Remove(parentTransform);
+        _movementPairs.Remove(parentTransform);
     }
 
     private void MoveObject(Transform parentTransform, GrabberInfo gi)
@@ -96,7 +100,7 @@ public class TheWorld : MonoBehaviour
         }
 
         penInfo.pen.isPenDown = true;
-        penInfo.pen.doodleTarget = doodleTarget;
+        penInfo.pen.doodleTarget = _doodleTarget;
 
         Bubble targetBubble = GetObjectNearestTransform<Bubble>(penWith);
 
@@ -105,20 +109,20 @@ public class TheWorld : MonoBehaviour
             penInfo.pen.targetBubble = targetBubble;
         }
 
-        pens.Add(penWith, penInfo);
+        _pens.Add(penWith, penInfo);
     }
 
     public void StopDrawing(Transform penWith)
     {
-        if (pens.ContainsKey(penWith))
+        if (_pens.ContainsKey(penWith))
         {
-            pens[penWith].pen.isPenDown = false;
+            _pens[penWith].pen.isPenDown = false;
 
             // Remove the doodle pen if our object didn't start with it
-            if (!pens[penWith].startedWithDoodlePen)
+            if (!_pens[penWith].startedWithDoodlePen)
                 Destroy(penWith.GetComponent<DoodlePen>());
 
-            pens.Remove(penWith);
+            _pens.Remove(penWith);
         }
     }
 
@@ -130,27 +134,81 @@ public class TheWorld : MonoBehaviour
         pen.targetBubble = GetObjectNearestTransform<Bubble>(hand);
     }
 
-    // Assuming that the bubble is stored in a scenenode's Geom child, this will add its doodles to the scenenode hierarchy so they
-    // will be rendered
-    /*private void AddDoodlesToSceneNode(Bubble bubble)
+    // Create a new bubble at the given transform's position. It will have no parents, by default
+    // If you choose to grab it afterwards, be sure to stop grabbing (ReleaseObject) later as well
+    public void CreateBubble(Transform at, bool grabAfterwards = false)
     {
-        foreach (MeshFilter mf in bubble.doodles)
+        GameObject BubbleNode = Resources.Load<GameObject>("Assets/MindMap/Prefabs/BubbleNode.prefab");
+        BubbleNode.transform.parent = transform;
+        BubbleNode.transform.position = at.position;
+        _roots.Add(BubbleNode.GetComponent<SceneNode>());
+
+        if (grabAfterwards)
+            GrabObject(at);
+    }
+
+    // Start attempting to reparent the closest object that the given transform is colliding with
+    public void BeginReparent(Transform parent)
+    {
+        Transform child = GetObjectNearestTransform(parent);
+
+        if (child)
         {
-            GameObject doodle = mf.gameObject;
-            NodePrimitive doodlePrimitive = doodle.AddComponent<NodePrimitive>();
-            // We don't need to do any crazy bullshit like adding this to the SceneNode's primitive list,
-            // as we've redefined the scenenode to try to use a list of geometries as a child "Geom",
-            // which this parent is
-            doodle.transform.parent = bubble.transform.parent; 
+            _reparentPairs.Add(parent, child);
         }
-    }*/
+    }
+
+    // If the bool is true, the reparented object will become a new root node. Otherwise, it remains with its current parent.
+    public void EndReparent(Transform parent, bool orphanIfNoTarget = false)
+    {
+        if(_reparentPairs.ContainsKey(parent))
+        {
+            if (_reparentPairs[parent] != null)
+            {
+                Transform target = GetObjectNearestTransform<Transform>(parent);
+
+                if (target == null)
+                {
+                    if (orphanIfNoTarget)
+                        _reparentPairs[parent].parent = transform;
+                }
+                else if (target != _reparentPairs[parent])
+                {
+                    // If we make this parent a child of one of its own children, we'll have one of those children remain connected to the
+                    // parent's parent
+                    if (target.IsChildOf(_reparentPairs[parent]))
+                    {
+                        Transform immediateChild = target;
+
+                        while (immediateChild.parent != _reparentPairs[parent])
+                            immediateChild = immediateChild.parent;
+
+                        immediateChild.parent = _reparentPairs[parent].parent;
+                        _reparentPairs[parent].parent = target.transform;
+                    }
+                    else
+                    {
+                        _reparentPairs[parent].parent = target.transform;
+                    }
+                }
+            }
+
+
+            _reparentPairs.Remove(parent);
+        }
+    }
+
 
     // Add the given pen's current doodle to the scenenode geometry of the bubble it's attached to
     private void AddDoodleToSceneNode(DoodlePen pen)
     {
-            GameObject doodle = pen.doodleTarget.gameObject;
-            NodePrimitive doodlePrimitive = doodle.AddComponent<NodePrimitive>();
+         GameObject doodle = pen.doodleTarget.gameObject;
+
+        if (!doodle.GetComponent<NodePrimitive>())
+        {
+            doodle.AddComponent<NodePrimitive>();
             doodle.transform.parent = pen.targetBubble.transform.parent;
+        }
     }
 
     // Find the transform of a scenenode object in the world nearest to the given transform that's colliding with it
@@ -159,27 +217,30 @@ public class TheWorld : MonoBehaviour
         return GetObjectNearestTransform<Transform>(parentTransform);
     }
 
-    // Find a component T attached to the nearest colliding object to the given transform
+    // Find a component T attached to the nearest colliding scenenode object to the given transform
     private T GetObjectNearestTransform<T>(Transform parentTransform) where T : Component
     {
         SceneNodeCollider target = null;
         T retVal = null;
         float dist = float.PositiveInfinity;
 
-        foreach (SceneNodeCollider snc in _root.gameObject.GetComponentsInChildren<SceneNodeCollider>())
+        foreach (SceneNode root in _roots)
         {
-            if (snc.gameObject.GetComponent<T>() || snc.transform.Find("Geom").GetComponentInChildren<T>())
+            foreach (SceneNodeCollider snc in root.gameObject.GetComponentsInChildren<SceneNodeCollider>())
             {
-                bool collides = snc.Collides(parentTransform);
-
-                if (collides)
+                if (snc.gameObject.GetComponent<T>() || snc.transform.Find("Geom").GetComponentInChildren<T>())
                 {
-                    float newDist = snc.SqrDistFrom(parentTransform);
+                    bool collides = snc.Collides(parentTransform);
 
-                    if (newDist < dist)
+                    if (collides)
                     {
-                        target = snc;
-                        dist = newDist;
+                        float newDist = snc.SqrDistFrom(parentTransform);
+
+                        if (newDist < dist)
+                        {
+                            target = snc;
+                            dist = newDist;
+                        }
                     }
                 }
             }

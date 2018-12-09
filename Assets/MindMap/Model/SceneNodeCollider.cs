@@ -11,7 +11,7 @@ public class SceneNodeCollider : MonoBehaviour {
     {
         get
         {
-            return transform.localToWorldMatrix.MultiplyPoint(new Vector3(0, 0, 0));
+            return GetComponent<Renderer>().material.GetMatrix("_ModelMatrix").MultiplyPoint(new Vector3(0, 0, 0));
         }
     }
 
