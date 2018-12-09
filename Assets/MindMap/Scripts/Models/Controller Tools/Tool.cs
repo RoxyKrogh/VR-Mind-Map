@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEditor;
 
 public class Tool : MonoBehaviour {
 
     public Renderer[] coloredGeometry = new Renderer[1];
+    public TheWorld.InteractionEvent onInteraction = new TheWorld.InteractionEvent();
+    public TheWorld.InteractionEvent offInteraction = new TheWorld.InteractionEvent();
 
     // Use this for initialization
     void Start() {

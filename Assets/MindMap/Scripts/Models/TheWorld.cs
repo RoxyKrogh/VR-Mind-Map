@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class TheWorld : MonoBehaviour
 {
@@ -21,6 +22,9 @@ public class TheWorld : MonoBehaviour
         public bool startedWithDoodlePen;
         public DoodlePen pen;
     }
+    
+    [System.Serializable]
+    public class InteractionEvent : UnityEvent<Transform> { }
 
     // List of all root scenenodes that are children of the world
     public List<SceneNode> _roots = new List<SceneNode>();
@@ -28,10 +32,11 @@ public class TheWorld : MonoBehaviour
     private delegate void TransformationMethod(Transform trs1, Transform trs2);
 
     private Dictionary<Transform, GrabberInfo> _movementPairs = new Dictionary<Transform, GrabberInfo>();
-
     private Dictionary<Transform, DoodlePenInfo> _pens = new Dictionary<Transform, DoodlePenInfo>();
-
     private Dictionary<Transform, Transform> _reparentPairs = new Dictionary<Transform, Transform>();
+
+    [SerializeField] /* show in inspector */
+    private GameObject bubblePrefab; // prefab to use for bubble objects
 
     // Use this for initialization
     void Start()
@@ -134,14 +139,26 @@ public class TheWorld : MonoBehaviour
         pen.targetBubble = GetObjectNearestTransform<Bubble>(hand);
     }
 
+    // TheWorld.InteractionEvent
+    public void CreateBubble(Transform at)
+    {
+        CreateBubble(at, false);
+    }
+
+    // TheWorld.InteractionEvent
+    public void CreateAndGrabBubble(Transform at)
+    {
+        CreateBubble(at, true);
+    }
+
     // Create a new bubble at the given transform's position. It will have no parents, by default
     // If you choose to grab it afterwards, be sure to stop grabbing (ReleaseObject) later as well
-    public void CreateBubble(Transform at, bool grabAfterwards = false)
+    public void CreateBubble(Transform at, bool grabAfterwards)
     {
-        GameObject BubbleNode = Resources.Load<GameObject>("Assets/MindMap/Prefabs/BubbleNode.prefab");
-        BubbleNode.transform.parent = transform;
-        BubbleNode.transform.position = at.position;
-        _roots.Add(BubbleNode.GetComponent<SceneNode>());
+        GameObject bubbleNode = Instantiate(bubblePrefab);
+        bubbleNode.transform.parent = transform;
+        bubbleNode.transform.position = at.position;
+        _roots.Add(bubbleNode.GetComponent<SceneNode>());
 
         if (grabAfterwards)
             GrabObject(at);
@@ -158,8 +175,20 @@ public class TheWorld : MonoBehaviour
         }
     }
 
+    // TheWorld.InteractionEvent
+    public void EndReparent(Transform parent)
+    {
+        EndReparent(parent, false);
+    }
+
+    // TheWorld.InteractionEvent
+    public void EndReparentOrOrphan(Transform parent)
+    {
+        EndReparent(parent, true);
+    }
+
     // If the bool is true, the reparented object will become a new root node. Otherwise, it remains with its current parent.
-    public void EndReparent(Transform parent, bool orphanIfNoTarget = false)
+    public void EndReparent(Transform parent, bool orphanIfNoTarget)
     {
         if(_reparentPairs.ContainsKey(parent))
         {

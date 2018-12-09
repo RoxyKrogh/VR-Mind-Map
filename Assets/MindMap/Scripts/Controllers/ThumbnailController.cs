@@ -18,8 +18,9 @@ public class ThumbnailController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        cameraGimbal.transform.position = selectedNode.WorldPosition;
-        cameraGimbal.transform.rotation = selectedNode.transform.rotation; // rotation is not different for SceneNode
+        if (selectedNode != null)
+            cameraGimbal.transform.position = selectedNode.WorldPosition;
+            cameraGimbal.transform.rotation = selectedNode.transform.rotation; // rotation is not different for SceneNode
     }
 
     private void OnSwipe(InputControlState state, Vector2 swipe)
