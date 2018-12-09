@@ -36,6 +36,7 @@ GameObject:
   - component: {fileID: 4567932449573836}
   - component: {fileID: 114944783339656256}
   - component: {fileID: 114816388992421380}
+  - component: {fileID: 114690876777363010}
   m_Layer: 0
   m_Name: BubbleNode
   m_TagString: Untagged
@@ -201,6 +202,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MyColor: {r: 0.1, g: 0.1, b: 0.2, a: 1}
   Pivot: {x: 0, y: 0, z: 0}
+--- !u!114 &114690876777363010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1424928820099274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c155927bd9457624994652d70ed93770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectedTo: {fileID: 0}
+  lineMaterial: {fileID: 2100000, guid: 0d8d656621ae07c48890766586e609c1, type: 2}
 --- !u!114 &114781674782903932
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -240,5 +254,6 @@ MonoBehaviour:
   NodeOrigin: {x: 0, y: 0, z: 0}
   PrimitiveList:
   - {fileID: 114643411003768540}
+  - {fileID: 114781674782903932}
   GeometryList: {fileID: 4152084512809710}
   AxisFrame: {fileID: 0}

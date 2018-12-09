@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ToolSelectController : MonoBehaviour {
 
+    public TheWorld world;
+
     public EquipmentSlot model;
     public EquipmentSlotView nextView;
     public EquipmentSlotView previousView;
@@ -11,10 +13,15 @@ public class ToolSelectController : MonoBehaviour {
 
     public InputController inputController;
 
+    public Material selectionMaterial;
+
     // Use this for initialization
     void Start () {
+        if (world == null)
+            world = GetComponentInParent<TheWorld>();
         inputController.onSelect.AddListener(OnSelectButton);
         inputController.onActivate.AddListener(OnInteract);
+        inputController.onMoved.AddListener(OnMoved);
         UpdateView();
     }
 	
@@ -24,6 +31,13 @@ public class ToolSelectController : MonoBehaviour {
         previousView.isHidden = !isTouched;
         nextView.isHidden = !isTouched;
         controlsPrompt.SetActive(isTouched);
+
+        SceneNode selection = world.GetSelectionFor<SceneNode>(inputController.HandObject);
+        if (selection != null)
+        {
+            MeshFilter filter = selection.GetComponentInChildren<MeshFilter>();
+            Graphics.DrawMesh(filter.mesh, selection.CombinedParentXform, selectionMaterial, LayerMask.NameToLayer("TransparentFX"));
+        }
     }
 
     void OnSelectButton(InputControlState state, bool isPress)
@@ -40,6 +54,11 @@ public class ToolSelectController : MonoBehaviour {
                 model.ActiveSlot += 1;
             UpdateView();
         }
+    }
+
+    private void OnMoved(InputControlState ics)
+    {
+        world.UpdateSelection(ics.HandObject);
     }
 
     void OnInteract(InputControlState state, bool isPress)

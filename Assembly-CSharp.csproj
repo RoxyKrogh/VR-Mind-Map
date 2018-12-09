@@ -82,6 +82,7 @@
     <Compile Include="Assets\MindMap\Scripts\Models\SceneNode\SceneNode.cs" />
     <Compile Include="Assets\MindMap\Scripts\Models\SceneNode\SceneNodeCollider.cs" />
     <Compile Include="Assets\MindMap\Scripts\Models\TheWorld.cs" />
+    <Compile Include="Assets\MindMap\Scripts\View\ConnectionRenderer.cs" />
     <Compile Include="Assets\MindMap\Scripts\View\EquipmentSlotView.cs" />
     <Compile Include="Assets\MindMap\Scripts\XForm Providers\DefaultXformProvider.cs" />
     <Compile Include="Assets\MindMap\Scripts\XForm Providers\PivotXformProvider.cs" />

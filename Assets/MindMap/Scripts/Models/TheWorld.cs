@@ -27,13 +27,14 @@ public class TheWorld : MonoBehaviour
     public class InteractionEvent : UnityEvent<Transform> { }
 
     // List of all root scenenodes that are children of the world
-    public List<SceneNode> _roots = new List<SceneNode>();
+    public SceneNode _root;
 
     private delegate void TransformationMethod(Transform trs1, Transform trs2);
 
     private Dictionary<Transform, GrabberInfo> _movementPairs = new Dictionary<Transform, GrabberInfo>();
     private Dictionary<Transform, DoodlePenInfo> _pens = new Dictionary<Transform, DoodlePenInfo>();
     private Dictionary<Transform, Transform> _reparentPairs = new Dictionary<Transform, Transform>();
+    private Dictionary<Transform, SceneNodeCollider> _selectionPairs = new Dictionary<Transform, SceneNodeCollider>();
 
     [SerializeField] /* show in inspector */
     private GameObject bubblePrefab; // prefab to use for bubble objects
@@ -41,22 +42,12 @@ public class TheWorld : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        foreach (Transform child in transform)
-        {
-            SceneNode node = child.GetComponent<SceneNode>();
-            if (node != null)
-                _roots.Add(node);
-        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        foreach(SceneNode root in _roots)
-        {
-            Matrix4x4 i = transform.localToWorldMatrix;
-            root.CompositeXform(ref i);
-        }
+        UpdateNodeTransforms();
 
         foreach (KeyValuePair<Transform, GrabberInfo> kvp in _movementPairs)
             MoveObject(kvp.Key, kvp.Value);
@@ -65,20 +56,50 @@ public class TheWorld : MonoBehaviour
             UpdatePenTarget(kvp.Key, kvp.Value.pen);
     }
 
+    void UpdateNodeTransforms()
+    {
+        Matrix4x4 i = transform.localToWorldMatrix;
+        _root.CompositeXform(ref i);
+    }
+
+    public SceneNodeCollider GetSelectionFor(Transform hand)
+    {
+        if (_selectionPairs.ContainsKey(hand))
+            return _selectionPairs[hand];
+        else
+            return null;
+    }
+
+    public T GetSelectionFor<T>(Transform hand)
+    {
+        SceneNodeCollider c = GetSelectionFor(hand);
+        if (c == null)
+            return default(T);
+        return c.GetComponent<T>();
+    }
+
+    public void UpdateSelection(Transform hand)
+    {
+        _selectionPairs[hand] = GetObjectNearestTransform<SceneNodeCollider>(hand);
+    }
+
     public void GrabObject(Transform parentTransform)
     {
         GrabberInfo grabberInfo = new GrabberInfo();
 
-        Transform target = GetObjectNearestTransform(parentTransform);
+        SceneNode target = GetSelectionFor<SceneNode>(parentTransform);
+
+        if (target == null)
+            target = _root;
 
         if (target)
         {
-            grabberInfo.child = target;
-            grabberInfo.startPos = parentTransform.worldToLocalMatrix.MultiplyPoint(target.position);
-            grabberInfo.startRotForward = parentTransform.worldToLocalMatrix.MultiplyVector(target.forward);
-            grabberInfo.startRotUp = parentTransform.worldToLocalMatrix.MultiplyVector(target.up);
+            grabberInfo.child = target.transform;
+            grabberInfo.startPos = parentTransform.worldToLocalMatrix.MultiplyPoint(target.WorldPosition);
+            grabberInfo.startRotForward = parentTransform.worldToLocalMatrix.MultiplyVector(target.WorldForward);
+            grabberInfo.startRotUp = parentTransform.worldToLocalMatrix.MultiplyVector(target.WorldUp);
 
-            _movementPairs.Add(parentTransform, grabberInfo);
+            _movementPairs[parentTransform] = grabberInfo;
         }
     }
 
@@ -89,8 +110,20 @@ public class TheWorld : MonoBehaviour
 
     private void MoveObject(Transform parentTransform, GrabberInfo gi)
     {
-        gi.child.position = parentTransform.localToWorldMatrix.MultiplyPoint(gi.startPos);
-        gi.child.rotation = Quaternion.LookRotation(parentTransform.localToWorldMatrix.MultiplyVector(gi.startRotForward), parentTransform.localToWorldMatrix.MultiplyVector(gi.startRotUp));
+        Vector3 worldTo = parentTransform.localToWorldMatrix.MultiplyPoint(gi.startPos);
+        Transform giparent = gi.child.parent;
+        SceneNode node = giparent.GetComponent<SceneNode>();
+        Matrix4x4 worldToLocal;
+        if (node != null)
+            worldToLocal = node.CombinedParentXform.inverse; // use scene node transform, if it is a scene node
+        else
+            worldToLocal = giparent.transform.worldToLocalMatrix; // else use unity transform
+        gi.child.localPosition = worldToLocal.MultiplyPoint(worldTo); // apply position, in giparent's local space
+
+        //if (_root != null && gi.child != _root.transform) // if the root node is grabbed, do not rotate
+        {
+            gi.child.rotation = Quaternion.LookRotation(parentTransform.localToWorldMatrix.MultiplyVector(gi.startRotForward), parentTransform.localToWorldMatrix.MultiplyVector(gi.startRotUp));
+        }
     }
 
     public void StartDrawing(Transform penWith)
@@ -107,14 +140,15 @@ public class TheWorld : MonoBehaviour
         penInfo.pen.isPenDown = true;
         penInfo.pen.doodleTarget = _doodleTarget;
 
-        Bubble targetBubble = GetObjectNearestTransform<Bubble>(penWith);
+        SceneNodeCollider selected = GetSelectionFor(penWith);
+        Bubble targetBubble = selected == null ? null : selected.GetComponentInChildren<Bubble>(); // get selected scene node
 
         if (targetBubble)
         {
             penInfo.pen.targetBubble = targetBubble;
         }
 
-        _pens.Add(penWith, penInfo);
+        _pens[penWith] = penInfo;
     }
 
     public void StopDrawing(Transform penWith)
@@ -136,7 +170,8 @@ public class TheWorld : MonoBehaviour
     {
         if(pen.isDrawing)
             AddDoodleToSceneNode(pen);
-        pen.targetBubble = GetObjectNearestTransform<Bubble>(hand);
+        SceneNodeCollider selected = GetSelectionFor(hand);
+        pen.targetBubble = selected == null ? null : selected.GetComponentInChildren<Bubble>(); // get selected scene node
     }
 
     // TheWorld.InteractionEvent
@@ -156,22 +191,25 @@ public class TheWorld : MonoBehaviour
     public void CreateBubble(Transform at, bool grabAfterwards)
     {
         GameObject bubbleNode = Instantiate(bubblePrefab);
-        bubbleNode.transform.parent = transform;
         bubbleNode.transform.position = at.position;
-        _roots.Add(bubbleNode.GetComponent<SceneNode>());
+        bubbleNode.transform.parent = _root.transform;
+        UpdateNodeTransforms(); // update bubbleNode's SceneNode transform
 
         if (grabAfterwards)
-            GrabObject(at);
+        {
+            _selectionPairs[at] = bubbleNode.GetComponent<SceneNodeCollider>(); // select the bubbleNode
+            GrabObject(at); // grab the bubbleNode
+        }
     }
 
     // Start attempting to reparent the closest object that the given transform is colliding with
     public void BeginReparent(Transform parent)
     {
-        Transform child = GetObjectNearestTransform(parent);
+        Transform child = GetSelectionFor<Transform>(parent); // get selected scene node
 
         if (child)
         {
-            _reparentPairs.Add(parent, child);
+            _reparentPairs[parent] = child;
         }
     }
 
@@ -194,7 +232,7 @@ public class TheWorld : MonoBehaviour
         {
             if (_reparentPairs[parent] != null)
             {
-                Transform target = GetObjectNearestTransform<Transform>(parent);
+                Transform target = GetSelectionFor<Transform>(parent); // get selected scene node
 
                 if (target == null)
                 {
@@ -253,23 +291,20 @@ public class TheWorld : MonoBehaviour
         T retVal = null;
         float dist = float.PositiveInfinity;
 
-        foreach (SceneNode root in _roots)
+        foreach (SceneNodeCollider snc in _root.gameObject.GetComponentsInChildren<SceneNodeCollider>())
         {
-            foreach (SceneNodeCollider snc in root.gameObject.GetComponentsInChildren<SceneNodeCollider>())
+            if (snc.gameObject.GetComponent<T>() || snc.transform.Find("Geom").GetComponentInChildren<T>())
             {
-                if (snc.gameObject.GetComponent<T>() || snc.transform.Find("Geom").GetComponentInChildren<T>())
+                bool collides = snc.Collides(parentTransform);
+
+                if (collides)
                 {
-                    bool collides = snc.Collides(parentTransform);
+                    float newDist = snc.SqrDistFrom(parentTransform);
 
-                    if (collides)
+                    if (newDist < dist)
                     {
-                        float newDist = snc.SqrDistFrom(parentTransform);
-
-                        if (newDist < dist)
-                        {
-                            target = snc;
-                            dist = newDist;
-                        }
+                        target = snc;
+                        dist = newDist;
                     }
                 }
             }

@@ -9,6 +9,9 @@ public class SceneNode : MonoBehaviour {
     private Matrix4x4 mCombinedParentXform;
     public Matrix4x4 CombinedParentXform { get { return mCombinedParentXform; } private set { mCombinedParentXform = value; } }
     public Vector3 WorldPosition { get { return mCombinedParentXform.GetColumn(3); } }
+    public Vector3 WorldRight { get { return mCombinedParentXform.GetColumn(0).normalized; } }
+    public Vector3 WorldUp { get { return mCombinedParentXform.GetColumn(1).normalized; } }
+    public Vector3 WorldForward { get { return mCombinedParentXform.GetColumn(2).normalized; } }
 
     public Vector3 NodeOrigin = Vector3.zero;
     public List<NodePrimitive> PrimitiveList;
@@ -16,6 +19,8 @@ public class SceneNode : MonoBehaviour {
 
     public Transform AxisFrame = null;
     private Vector3 kDefaultTreeTip = new Vector3(0, 0, 0);
+
+    public static Material lineMaterial;
 
 	// Use this for initialization
 	protected void Start () {
