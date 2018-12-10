@@ -19,14 +19,25 @@ public class ToolSelectController : MonoBehaviour {
     void Start () {
         if (world == null)
             world = GetComponentInParent<TheWorld>();
+        UpdateView();
+    }
+
+    private void OnEnable()
+    {
         inputController.onSelect.AddListener(OnSelectButton);
         inputController.onActivate.AddListener(OnInteract);
         inputController.onMoved.AddListener(OnMoved);
-        UpdateView();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    private void OnDisable()
+    {
+        inputController.onSelect.RemoveListener(OnSelectButton);
+        inputController.onActivate.RemoveListener(OnInteract);
+        inputController.onMoved.RemoveListener(OnMoved);
+    }
+
+    // Update is called once per frame
+    void Update () {
         bool isTouched = inputController.IsTouched;
         previousView.isHidden = !isTouched;
         nextView.isHidden = !isTouched;
@@ -44,6 +55,7 @@ public class ToolSelectController : MonoBehaviour {
     {
         if (isPress)
         {
+            Debug.Log("ToolSelect");
             Vector2 axis = state.AxisPosition;
             const float THRESHOLD = 0.4f;
             if (Mathf.Abs(axis.x) > THRESHOLD)
@@ -64,11 +76,14 @@ public class ToolSelectController : MonoBehaviour {
 
     void OnInteract(InputControlState state, bool isPress)
     {
+        Debug.Log("OnInteract with " + transform.parent.name + " " + isPress + " from " + state.HandObject.parent.name);
         Interact(isPress);
     }
 
     void Interact(bool isOn)
     {
+        gameObject.name = "EquionentSlot" + isOn;
+        Debug.Log("Interact with " + transform.parent.name + " " + isOn);
         if (model.ActiveTool == null)
             return;
         if (isOn)

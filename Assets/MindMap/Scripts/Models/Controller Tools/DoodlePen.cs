@@ -112,7 +112,7 @@ public class DoodlePen : MonoBehaviour
 
     void DrawLine()
     {
-        Debug.Log("Bubble we're in: " + targetBubble.name);
+        //Debug.Log("Bubble we're in: " + targetBubble.name);
         bool editLast = false;
         Vector3 doodlePoint = doodleTarget.transform.worldToLocalMatrix.MultiplyPoint(transform.position);
 

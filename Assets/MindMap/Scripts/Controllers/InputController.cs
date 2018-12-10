@@ -129,7 +129,6 @@ public class InputController : MonoBehaviour, InputControlState
     // Use this for initialization
     void Start () {
         SteamVR_Behaviour_Pose pose = GetComponent<SteamVR_Behaviour_Pose>();
-        inputSource = pose.inputSource;
         pose.onConnectedChanged.AddListener(OnConnectedChanged);
     }
 
@@ -137,6 +136,9 @@ public class InputController : MonoBehaviour, InputControlState
     {
         // bind events
         SteamVR_Behaviour_Pose pose = GetComponent<SteamVR_Behaviour_Pose>();
+        if (pose.inputSource != inputSource)
+            OnDisable(); // unbind old events
+        inputSource = pose.inputSource;
         if (!_boundEvents)
         {
             _boundEvents = true;
@@ -145,7 +147,6 @@ public class InputController : MonoBehaviour, InputControlState
             grabAction.AddOnChangeListener(OnGrabActionPressedOrReleased, inputSource);
             activateAction.AddOnChangeListener(OnActivateActionPressedOrReleased, inputSource);
             selectAction.AddOnChangeListener(OnSelectActionPressedOrReleased, inputSource);
-            touchAction.AddOnChangeListener(OnActivateActionPressedOrReleased, inputSource);
             swipeAction.AddOnChangeListener(OnSwipeAction, inputSource);
         }
     }
@@ -153,17 +154,16 @@ public class InputController : MonoBehaviour, InputControlState
 
     void OnDisable()
     {
+        SteamVR_Behaviour_Pose pose = GetComponent<SteamVR_Behaviour_Pose>();
         if (_boundEvents)
         {
             _boundEvents = false;
             Debug.Log("Unbinding controller events for " + inputSource);
             // unbind events
-            SteamVR_Behaviour_Pose pose = GetComponent<SteamVR_Behaviour_Pose>();
             pose.onTransformChanged.RemoveListener(OnHandMoved);
             grabAction.RemoveOnChangeListener(OnGrabActionPressedOrReleased, inputSource);
             activateAction.RemoveOnChangeListener(OnActivateActionPressedOrReleased, inputSource);
             selectAction.RemoveOnChangeListener(OnSelectActionPressedOrReleased, inputSource);
-            touchAction.RemoveOnChangeListener(OnActivateActionPressedOrReleased, inputSource);
             swipeAction.RemoveOnChangeListener(OnSwipeAction, inputSource);
         }
     }
@@ -172,7 +172,7 @@ public class InputController : MonoBehaviour, InputControlState
     {
         bool wasConnected = pose.GetLastDeviceIsConnected(inputSource);
         bool isConnected = pose.GetDeviceIsConnected(inputSource);
-        if (isConnected && !wasConnected)
+        if (isConnected && !wasConnected && isActiveAndEnabled)
             OnEnable();
         else if (wasConnected && !isConnected)
             OnDisable();
