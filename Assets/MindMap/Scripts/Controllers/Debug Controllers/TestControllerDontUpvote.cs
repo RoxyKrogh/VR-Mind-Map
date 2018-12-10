@@ -18,7 +18,7 @@ public class TestControllerDontUpvote : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        
 	}
 
     private void onGrab(InputControlState ics, bool grabbed)
