@@ -64,6 +64,7 @@ public class EquipmentSlot : MonoBehaviour {
             this[_activeSlot].gameObject.SetActive(true);
     }
 
+#if UNITY_EDITOR
     [CustomEditor(typeof(EquipmentSlot))]
     public class EquipmentSlotEditor : Editor
     {
@@ -78,6 +79,7 @@ public class EquipmentSlot : MonoBehaviour {
             EditorGUILayout.LabelField("Active Tool", toolName);
         }
     }
+#endif
 
     public static int WrappedIndex(int index, int length)
     {

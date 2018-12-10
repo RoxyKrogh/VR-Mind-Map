@@ -44,6 +44,7 @@ public class ConnectionRenderer : MonoBehaviour {
                 m.SetVertices(new List<Vector3>() { thisPos + thisToThat * gapLength, thatPos - thisToThat * gapLength });
                 m.SetColors(new List<Color>() { Color.red, Color.blue });
                 m.SetIndices(new int[] { 0, 1, 0 }, MeshTopology.LineStrip, 0);
+                m.bounds = new Bounds(Vector3.zero, Vector3.one * 10000.0f);
                 Graphics.DrawMesh(m, Matrix4x4.identity, lineMaterial, 0);
             }
         }

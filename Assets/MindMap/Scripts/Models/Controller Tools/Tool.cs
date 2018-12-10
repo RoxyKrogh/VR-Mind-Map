@@ -63,7 +63,7 @@ public class Tool : MonoBehaviour {
     {
         get { return transform.Find("Tip"); }
     }
-
+#if UNITY_EDITOR
     [CustomEditor(typeof(Tool))]
     public class ToolEditor : Editor
     {
@@ -74,4 +74,5 @@ public class Tool : MonoBehaviour {
             myTarget.ToolColor = EditorGUILayout.ColorField("Tool Color", myTarget.ToolColor);
         }
     }
+#endif
 }

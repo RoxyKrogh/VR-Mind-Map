@@ -15,8 +15,6 @@ public class DoodlePen : MonoBehaviour
 
     private bool _isPenDown = false;
 
-    private Activatable activatable;
-
     private Bubble _targetBubble;
 
     public Renderer debugRenderer;
@@ -95,8 +93,6 @@ public class DoodlePen : MonoBehaviour
         doodleTarget.mesh = doodleMesh;
         UpdateDoodleMesh();
 
-        activatable = GetComponent<Activatable>();
-
         targetBubble.AddDoodle(doodleTarget);
     }
 
@@ -157,8 +153,6 @@ public class DoodlePen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isPenDown = activatable == null || !activatable.enabled || activatable.isActive;
-
         if (isDrawing)
         {
             if (linePoints.Count == 0 || (transform.position - doodleTarget.transform.localToWorldMatrix.MultiplyPoint(linePoints[linePoints.Count - 1])).sqrMagnitude > 0.0001f)

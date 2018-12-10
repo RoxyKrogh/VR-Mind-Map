@@ -61,14 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\#UNUSED_ASSETS\Other Scripts\DisableFrustumCuling.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Doodle\CrossTest.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Doodle\PostProcessFX.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Scripts\Doodle\DoodleController.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Scripts\VR\Activatable.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Scripts\VR\Grabbable.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Scripts\VR\Grabber.cs" />
-    <Compile Include="Assets\#UNUSED_ASSETS\Prototype\Scripts\VRTouchOrbit.cs" />
     <Compile Include="Assets\MindMap\Scripts\Controllers\Debug Controllers\MainController.cs" />
     <Compile Include="Assets\MindMap\Scripts\Controllers\Debug Controllers\TestControllerDontUpvote.cs" />
     <Compile Include="Assets\MindMap\Scripts\Controllers\InputController.cs" />
@@ -84,10 +76,6 @@
     <Compile Include="Assets\MindMap\Scripts\Models\TheWorld.cs" />
     <Compile Include="Assets\MindMap\Scripts\View\ConnectionRenderer.cs" />
     <Compile Include="Assets\MindMap\Scripts\View\EquipmentSlotView.cs" />
-    <Compile Include="Assets\MindMap\Scripts\XForm Providers\DefaultXformProvider.cs" />
-    <Compile Include="Assets\MindMap\Scripts\XForm Providers\PivotXformProvider.cs" />
-    <Compile Include="Assets\MindMap\Scripts\XForm Providers\RenderXform.cs" />
-    <Compile Include="Assets\MindMap\Scripts\XForm Providers\XformProvider.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_TestThrow.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_TestTrackedCamera.cs" />
@@ -256,15 +244,10 @@
     <None Include="Assets\MindMap\Materials\Bubble\BubblePass.cginc" />
     <None Include="Assets\MindMap\Materials\Doodle\DoodleLine.shader" />
     <None Include="Assets\SteamVR\Resources\SteamVR_Fade.shader" />
-    <None Include="Assets\#UNUSED_ASSETS\SceneNode Materials\451Shader.shader" />
     <None Include="Assets\SteamVR\Resources\SteamVR_ClearAll.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Hints\Shaders\ControllerButtonHints.shader" />
-    <None Include="Assets\#UNUSED_ASSETS\Prototype\Doodle\VRShader.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Samples\BuggyBuddy\Materials\LightCone.shader" />
-    <None Include="Assets\#UNUSED_ASSETS\SceneNode Materials\451ShaderWithTexture.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Teleport\Shaders\Highlight.shader" />
-    <None Include="Assets\#UNUSED_ASSETS\Prototype\Doodle\Glow.shader" />
-    <None Include="Assets\#UNUSED_ASSETS\Prototype\Doodle\FXAA3.cginc" />
     <None Include="Assets\SteamVR\InteractionSystem\Teleport\Shaders\HighlighGlobal.shader" />
     <None Include="Assets\MindMap\Materials\Bubble\UnityBubble.shader" />
     <None Include="Assets\MindMap\Materials\Doodle\DoodleLine.cginc" />

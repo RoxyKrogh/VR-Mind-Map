@@ -9,7 +9,6 @@
 	{
 		Tags { "RenderType" = "Opaque" "LightMode" = "ForwardBase" }
 		LOD 100
-		CULL OFF
 
 		Pass
 		{
