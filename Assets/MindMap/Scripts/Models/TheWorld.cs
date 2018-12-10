@@ -278,6 +278,23 @@ public class TheWorld : MonoBehaviour
         }
     }
 
+    public void PopBubble(Transform at)
+    {
+        SceneNode target = GetSelectionFor<SceneNode>(at);
+
+        if (target)
+        {
+            // Make all the immediate children a new root
+            foreach(Transform child in target.transform)
+            {
+                if (child.GetComponent<SceneNode>())
+                    child.parent = _root.transform;
+            }
+
+            Destroy(target.gameObject);
+        }
+    }
+
 
     // Add the given pen's current doodle to the scenenode geometry of the bubble it's attached to
     private void AddDoodleToSceneNode(DoodlePen pen)
