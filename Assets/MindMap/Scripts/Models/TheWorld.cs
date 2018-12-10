@@ -56,6 +56,7 @@ public class TheWorld : MonoBehaviour
     {
         UpdateNodeTransforms();
 
+
         foreach (KeyValuePair<Transform, GrabberInfo> kvp in _movementPairs)
             MoveObject(kvp.Key, kvp.Value);
 
@@ -77,11 +78,11 @@ public class TheWorld : MonoBehaviour
             return null;
     }
 
-    public T GetSelectionFor<T>(Transform hand)
+    public T GetSelectionFor<T>(Transform hand) where T : Component
     {
         SceneNodeCollider c = GetSelectionFor(hand);
         if (c == null)
-            return default(T);
+            return null;
         return c.GetComponent<T>();
     }
 

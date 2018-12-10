@@ -54,11 +54,12 @@ public class ToolSelectController : MonoBehaviour {
                 model.ActiveSlot += 1;
             UpdateView();
         }
+
     }
 
     private void OnMoved(InputControlState ics)
     {
-        world.UpdateSelection(ics.HandObject);
+            world.UpdateSelection(ics.HandObject);
     }
 
     void OnInteract(InputControlState state, bool isPress)
