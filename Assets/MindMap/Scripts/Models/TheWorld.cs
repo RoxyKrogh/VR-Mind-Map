@@ -249,7 +249,7 @@ public class TheWorld : MonoBehaviour
                 if (target == null)
                 {
                     if (orphanIfNoTarget)
-                        _reparentPairs[parent].child.parent = transform;
+                        _reparentPairs[parent].child.parent = _root.transform;
                 }
                 else if (target != _reparentPairs[parent].child)
                 {
