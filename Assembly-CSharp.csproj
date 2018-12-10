@@ -268,6 +268,7 @@
     <None Include="Assets\SteamVR\InteractionSystem\Teleport\Shaders\HighlighGlobal.shader" />
     <None Include="Assets\MindMap\Materials\Bubble\UnityBubble.shader" />
     <None Include="Assets\MindMap\Materials\Doodle\DoodleLine.cginc" />
+    <None Include="Assets\MindMap\Materials\Sky\SkyShader.shader" />
     <None Include="Assets\MindMap\Materials\Doodle\DoodleDebug.cginc" />
     <None Include="Assets\MindMap\Materials\Bubble\Bubble.shader" />
     <None Include="Assets\SteamVR\Resources\SteamVR_SphericalProjection.shader" />
