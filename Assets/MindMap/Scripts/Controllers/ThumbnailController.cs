@@ -11,6 +11,8 @@ public class ThumbnailController : MonoBehaviour
     public TheWorld world;
     public NodePrimitive defaultNode;
 
+    private bool isSwiping = false;
+
     // Use this for initialization
     void Start()
     {
@@ -23,6 +25,8 @@ public class ThumbnailController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!inputController.IsTouched)
+            isSwiping = false;
         if (selectedNode != null)
         {
             cameraGimbal.transform.position = selectedNode.WorldPosition;
@@ -36,7 +40,28 @@ public class ThumbnailController : MonoBehaviour
 
     private void OnSwipe(InputControlState state, Vector2 swipe)
     {
-        Swipe(swipe * 45.0f);
+        const float SLIDE_THRESHOLD = 0.04f;
+        const float EDGE_THRESHOLD = 0.7f;
+        float mag = swipe.sqrMagnitude;
+        if (mag > SLIDE_THRESHOLD * SLIDE_THRESHOLD)
+            isSwiping = true;
+        if (isSwiping)
+        {
+            Vector2 startV = (state.AxisPosition - state.AxisDelta);
+            Vector2 endV = state.AxisPosition;
+            if (startV.sqrMagnitude > EDGE_THRESHOLD * EDGE_THRESHOLD && endV.sqrMagnitude > EDGE_THRESHOLD * EDGE_THRESHOLD)
+            {
+                startV = startV.normalized;
+                endV = endV.normalized;
+                float startA = Mathf.Atan2(startV.y, startV.x) * Mathf.Rad2Deg;
+                float endA = Mathf.Atan2(endV.y, endV.x) * Mathf.Rad2Deg;
+                float deltaA = Mathf.DeltaAngle(startA, endA);
+                Spin(deltaA);
+            }
+            else
+                Swipe(swipe * 45.0f);
+            
+        }
     }
 
     private void OnMoved(InputControlState state)
@@ -51,13 +76,22 @@ public class ThumbnailController : MonoBehaviour
         selectedNode = thumbnail.GetComponent<NodePrimitive>();
     }
 
-    void Swipe(Vector2 input)
+    void Swipe(Vector2 delta)
     {
         if (selectedNode != null)
         {
             Transform t = selectedNode.transform;
-            t.localRotation = Quaternion.AngleAxis(input.x, Vector3.up) * t.localRotation;
-            t.localRotation = Quaternion.AngleAxis(input.y, t.localRotation * Vector3.right) * t.localRotation;
+            t.localRotation = t.localRotation * Quaternion.AngleAxis(delta.x, Vector3.up);
+            t.localRotation = t.localRotation * Quaternion.AngleAxis(delta.y, Vector3.right);
+        }
+    }
+
+    void Spin(float angle)
+    {
+        if (selectedNode != null)
+        {
+            Transform t = selectedNode.transform;
+            t.rotation = Quaternion.AngleAxis(angle, t.forward) * t.rotation;
         }
     }
 }

@@ -191,7 +191,7 @@ public class InputController : MonoBehaviour, InputControlState
     private void OnSwipeAction(SteamVR_Action_In action_In)
     {
         // if this is not the first event since the trackpad was touched (do not swipe from default position {0,0}).
-        if (touchAction.GetLastState(inputSource) && IsTouched) 
+        if (touchAction.GetLastState(inputSource) && IsTouched && swipeAction.GetAxis(inputSource) != Vector2.zero) 
             onSwipe.Invoke(this, swipeAction.GetAxisDelta(inputSource));
     }
 
