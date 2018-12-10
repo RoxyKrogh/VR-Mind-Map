@@ -9,6 +9,7 @@ public class Tool : MonoBehaviour {
     public Renderer[] coloredGeometry = new Renderer[1];
     public TheWorld.InteractionEvent onInteraction = new TheWorld.InteractionEvent();
     public TheWorld.InteractionEvent offInteraction = new TheWorld.InteractionEvent();
+    public bool isToggleAction = true; // the tool starts/stops performing the action on trigger pull/release
 
     // Use this for initialization
     void Start() {

@@ -70,6 +70,8 @@ public class InputController : MonoBehaviour, InputControlState
 
     private bool _boundEvents = false;
 
+    public GameObject viewChild;
+
     public bool IsTouched
     {
         get
@@ -148,6 +150,8 @@ public class InputController : MonoBehaviour, InputControlState
             activateAction.AddOnChangeListener(OnActivateActionPressedOrReleased, inputSource);
             selectAction.AddOnChangeListener(OnSelectActionPressedOrReleased, inputSource);
             swipeAction.AddOnChangeListener(OnSwipeAction, inputSource);
+            if (viewChild != null)
+                viewChild.SetActive(true);
         }
     }
 
@@ -157,6 +161,8 @@ public class InputController : MonoBehaviour, InputControlState
         SteamVR_Behaviour_Pose pose = GetComponent<SteamVR_Behaviour_Pose>();
         if (_boundEvents)
         {
+            if (viewChild != null)
+                viewChild.SetActive(false);
             _boundEvents = false;
             Debug.Log("Unbinding controller events for " + inputSource);
             // unbind events

@@ -59,14 +59,14 @@ public class ToolSelectController : MonoBehaviour {
             Vector2 axis = state.AxisPosition;
             const float THRESHOLD = 0.4f;
             if (Mathf.Abs(axis.x) > THRESHOLD)
-                Interact(false); // stop interaction when changing tools
+                if (model != null && model.ActiveTool != null && model.ActiveTool.isToggleAction) // if the active tool has a toggleable interaction/state
+                    Interact(false); // stop interaction when changing tools
             if (axis.x < -THRESHOLD) // previous tool
                 model.ActiveSlot -= 1;
             else if (axis.x > THRESHOLD) // next tool
                 model.ActiveSlot += 1;
             UpdateView();
         }
-
     }
 
     private void OnMoved(InputControlState ics)
@@ -82,7 +82,6 @@ public class ToolSelectController : MonoBehaviour {
 
     void Interact(bool isOn)
     {
-        gameObject.name = "EquionentSlot" + isOn;
         Debug.Log("Interact with " + transform.parent.name + " " + isOn);
         if (model.ActiveTool == null)
             return;

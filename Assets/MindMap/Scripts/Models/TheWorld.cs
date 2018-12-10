@@ -284,11 +284,20 @@ public class TheWorld : MonoBehaviour
 
         if (target)
         {
-            // Make all the immediate children a new root
-            foreach(Transform child in target.transform)
+            Debug.Log("Popping " + target + " with " + target.transform.childCount + " children");
+
+            int repetitions = 3;
+            while (target.GetComponentsInChildren<SceneNode>().Length > 1 && repetitions-- > 0)
             {
-                if (child.GetComponent<SceneNode>())
-                    child.parent = _root.transform;
+                // Make all the immediate children a new root
+                foreach (Transform child in target.transform)
+                {
+                    if (child.GetComponent<SceneNode>())
+                    {
+                        Debug.Log("Not popping child " + child);
+                        child.parent = _root.transform;
+                    }
+                }
             }
 
             Destroy(target.gameObject);
