@@ -174,7 +174,6 @@ public class DoodlePen : MonoBehaviour
     {
         if (!isInBubble)
             return;
-        Debug.Log("Entered bubble " + targetBubble);
         if (isPenDown)
             NewDoodle();
     }
@@ -183,7 +182,12 @@ public class DoodlePen : MonoBehaviour
     {
         if (isInBubble)
             return;
-        Debug.Log("Exited bubble " + targetBubble);
         EndDoodle();
+    }
+
+    private void OnDestroy()
+    {
+        if (doodleTarget != null && doodleTarget.GetComponentInParent<SceneNode>() == null)
+            Destroy(doodleTarget.gameObject);
     }
 }
