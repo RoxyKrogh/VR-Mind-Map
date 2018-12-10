@@ -41,8 +41,11 @@
 			{
 				v2g o;
 				o.vertex = mul(_ModelMatrix, v.vertex); // vertex from local to world space
-				o.normal = mul(_ModelMatrix_IT, v.normal); // normal from local to world space
-				o.tangent = mul(_ModelMatrix, v.tangent); // tangent from local to world space
+				o.normal = normalize(mul(_ModelMatrix_IT, v.normal)); // normal from local to world space
+				float4 tang = v.tangent;
+				tang.w = 0.0;
+				//tang.xyz += v.vertex.xyz;
+				o.tangent = mul(_ModelMatrix_IT, tang); // tangent from local to world space
 				return o;
 			}
 
@@ -104,7 +107,7 @@
 				float4 vert2 = point00;
 				float4 vert3 = point31;
 				float4 vert4 = point30;
-				OUT_TRI(vert1, vert2, vert3, vert4); // output a quad
+				OUT_TRI(vert1, vert3, vert2, vert4); // output a quad
 				
 				vert1 = point21;
 				vert2 = point20;
@@ -114,7 +117,7 @@
 				/* ( vert1/2 are shared with the previous quad ) */
 				vert3 = point11;
 				vert4 = point10;
-				OUT_TRI(vert1, vert2, vert3, vert4); // output a quad
+				OUT_TRI(vert1, vert3, vert2, vert4); // output a quad
 
 				vert1 = point01;
 				vert2 = point00;

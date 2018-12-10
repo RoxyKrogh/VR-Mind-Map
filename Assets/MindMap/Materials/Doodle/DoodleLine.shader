@@ -9,10 +9,10 @@
 	{
 		Tags { "RenderType" = "Opaque" "LightMode" = "ForwardBase" }
 		LOD 100
-		CULL OFF
 
 		Pass
 		{
+			CULL BACK
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
