@@ -22,6 +22,13 @@ public class TheWorld : MonoBehaviour
         public bool startedWithDoodlePen;
         public DoodlePen pen;
     }
+
+    private struct ReparentInfo
+    {
+        public Transform child;
+        public float prevGapLength;
+        public ConnectionRenderer connectionRenderer;
+    }
     
     [System.Serializable]
     public class InteractionEvent : UnityEvent<Transform> { }
@@ -33,7 +40,7 @@ public class TheWorld : MonoBehaviour
 
     private Dictionary<Transform, GrabberInfo> _movementPairs = new Dictionary<Transform, GrabberInfo>();
     private Dictionary<Transform, DoodlePenInfo> _pens = new Dictionary<Transform, DoodlePenInfo>();
-    private Dictionary<Transform, Transform> _reparentPairs = new Dictionary<Transform, Transform>();
+    private Dictionary<Transform, ReparentInfo> _reparentPairs = new Dictionary<Transform, ReparentInfo>();
     private Dictionary<Transform, SceneNodeCollider> _selectionPairs = new Dictionary<Transform, SceneNodeCollider>();
 
     [SerializeField] /* show in inspector */
@@ -143,10 +150,7 @@ public class TheWorld : MonoBehaviour
         SceneNodeCollider selected = GetSelectionFor(penWith);
         Bubble targetBubble = selected == null ? null : selected.GetComponentInChildren<Bubble>(); // get selected scene node
 
-        if (targetBubble)
-        {
-            penInfo.pen.targetBubble = targetBubble;
-        }
+        penInfo.pen.targetBubble = targetBubble;
 
         _pens[penWith] = penInfo;
     }
@@ -170,6 +174,7 @@ public class TheWorld : MonoBehaviour
     {
         if(pen.isDrawing)
             AddDoodleToSceneNode(pen);
+
         SceneNodeCollider selected = GetSelectionFor(hand);
         pen.targetBubble = selected == null ? null : selected.GetComponentInChildren<Bubble>(); // get selected scene node
     }
@@ -209,7 +214,13 @@ public class TheWorld : MonoBehaviour
 
         if (child)
         {
-            _reparentPairs[parent] = child;
+            ReparentInfo repInfo = new ReparentInfo();
+            repInfo.child = child;
+            repInfo.connectionRenderer = child.GetComponent<ConnectionRenderer>();
+            repInfo.connectionRenderer.connectedTo = parent;
+            repInfo.prevGapLength = repInfo.connectionRenderer.gapLength;
+            repInfo.connectionRenderer.gapLength = 0;
+            _reparentPairs[parent] = repInfo;
         }
     }
 
@@ -230,37 +241,38 @@ public class TheWorld : MonoBehaviour
     {
         if(_reparentPairs.ContainsKey(parent))
         {
-            if (_reparentPairs[parent] != null)
+            if (_reparentPairs[parent].child != null)
             {
                 Transform target = GetSelectionFor<Transform>(parent); // get selected scene node
 
                 if (target == null)
                 {
                     if (orphanIfNoTarget)
-                        _reparentPairs[parent].parent = transform;
+                        _reparentPairs[parent].child.parent = transform;
                 }
-                else if (target != _reparentPairs[parent])
+                else if (target != _reparentPairs[parent].child)
                 {
                     // If we make this parent a child of one of its own children, we'll have one of those children remain connected to the
                     // parent's parent
-                    if (target.IsChildOf(_reparentPairs[parent]))
+                    if (target.IsChildOf(_reparentPairs[parent].child))
                     {
                         Transform immediateChild = target;
 
-                        while (immediateChild.parent != _reparentPairs[parent])
+                        while (immediateChild.parent != _reparentPairs[parent].child)
                             immediateChild = immediateChild.parent;
 
-                        immediateChild.parent = _reparentPairs[parent].parent;
-                        _reparentPairs[parent].parent = target.transform;
+                        immediateChild.parent = _reparentPairs[parent].child.parent;
+                        _reparentPairs[parent].child.parent = target.transform;
                     }
                     else
                     {
-                        _reparentPairs[parent].parent = target.transform;
+                        _reparentPairs[parent].child.parent = target.transform;
                     }
                 }
             }
 
-
+            _reparentPairs[parent].connectionRenderer.gapLength = _reparentPairs[parent].prevGapLength;
+            _reparentPairs[parent].connectionRenderer.connectedTo = null;
             _reparentPairs.Remove(parent);
         }
     }

@@ -23,7 +23,6 @@ public class TestControllerDontUpvote : MonoBehaviour {
 
     private void onGrab(InputControlState ics, bool grabbed)
     {
-        Debug.Log("Grab action! " + grabbed);
         if (grabbed)
             _theWorld.GrabObject(ics.HandObject.transform);
         else

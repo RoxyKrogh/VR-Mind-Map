@@ -43,10 +43,13 @@ public class DoodlePen : MonoBehaviour
         {
             Bubble wasIn = _targetBubble;
             _targetBubble = value;
+
             if ((!wasIn && isInBubble) || (wasIn != targetBubble))
                 EnteredBubble();
             else if (wasIn && !isInBubble)
                 ExitedBubble();
+
+            
         }
     }
 
@@ -73,7 +76,7 @@ public class DoodlePen : MonoBehaviour
             MeshFilter newTarget = Instantiate(doodleTarget);
             newTarget.sharedMesh = null;
             Debug.Log("Binding doodle to " + targetBubble);
-            targetBubble.AddDoodle(doodleTarget);
+            //targetBubble.AddDoodle(doodleTarget);
             doodleTarget = newTarget;
         }
     }
@@ -93,6 +96,8 @@ public class DoodlePen : MonoBehaviour
         UpdateDoodleMesh();
 
         activatable = GetComponent<Activatable>();
+
+        targetBubble.AddDoodle(doodleTarget);
     }
 
     void UpdateDoodleMesh()
